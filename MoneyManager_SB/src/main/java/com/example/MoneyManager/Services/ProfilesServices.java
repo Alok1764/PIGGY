@@ -6,6 +6,7 @@ import com.example.MoneyManager.Entities.Profiles;
 import com.example.MoneyManager.Repositories.ProfilesRepo;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -17,6 +18,7 @@ public class ProfilesServices {
     private final ProfilesRepo profilesRepo;
     private final ModelMapper modelMapper;
     private final EmailService emailService;
+    private final PasswordEncoder passwordEncoder;
 
     public ProfileDTO registerProfile(ProfileCreateDTO profileCreateDTO) throws RuntimeException {
         boolean isEmailExist=profilesRepo.existsByEmail(profileCreateDTO.getEmail());
@@ -26,7 +28,7 @@ public class ProfilesServices {
         Profiles profiles=Profiles.builder()
                 .fullName(profileCreateDTO.getFullName())
                 .email(profileCreateDTO.getEmail())
-                .password(profileCreateDTO.getPassword())
+                .password(passwordEncoder.encode(profileCreateDTO.getPassword()))
                 .activationToken(UUID.randomUUID().toString())
                 .build();
         Profiles savedProfile=profilesRepo.save(profiles);
